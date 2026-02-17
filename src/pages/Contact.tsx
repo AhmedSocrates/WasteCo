@@ -1,44 +1,129 @@
 import { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, CheckCircle2, Sparkles, Send } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, CheckCircle2, Sparkles, Send, AlertCircle, Loader2 } from 'lucide-react';
 import { OrganicBackground } from '../components/OrganicBackground';
 
-export function Contact() {
-  const [formData, setFormData] = useState({
-    companyName: '',
-    contactPerson: '',
-    industry: '',
-    phone: '',
-    email: '',
-    wasteVolume: '',
-    message: '',
-  });
+// ──────────────────────────────────────────────
+// Replace with your actual Formspree form ID
+// Create one free at https://formspree.io
+// ──────────────────────────────────────────────
+const FORMSPREE_URL = 'https://formspree.io/f/mqedbgdr';
 
+interface FormData {
+  companyName: string;
+  contactPerson: string;
+  industry: string;
+  phone: string;
+  email: string;
+  wasteVolume: string;
+  message: string;
+}
+
+interface FormErrors {
+  companyName?: string;
+  contactPerson?: string;
+  industry?: string;
+  phone?: string;
+  email?: string;
+  wasteVolume?: string;
+}
+
+const initialFormData: FormData = {
+  companyName: '',
+  contactPerson: '',
+  industry: '',
+  phone: '',
+  email: '',
+  wasteVolume: '',
+  message: '',
+};
+
+function validateForm(data: FormData): FormErrors {
+  const errors: FormErrors = {};
+
+  if (!data.companyName.trim()) {
+    errors.companyName = 'Company name is required';
+  }
+  if (!data.contactPerson.trim()) {
+    errors.contactPerson = 'Contact person is required';
+  }
+  if (!data.industry) {
+    errors.industry = 'Please select an industry';
+  }
+  if (!data.phone.trim()) {
+    errors.phone = 'Phone number is required';
+  }
+  if (!data.email.trim()) {
+    errors.email = 'Email address is required';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.email = 'Please enter a valid email address';
+  }
+  if (!data.wasteVolume) {
+    errors.wasteVolume = 'Please select an estimated volume';
+  }
+
+  return errors;
+}
+
+export function Contact() {
+  const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear field error on change
+    if (errors[name as keyof FormErrors]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
-    
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        companyName: '',
-        contactPerson: '',
-        industry: '',
-        phone: '',
-        email: '',
-        wasteVolume: '',
-        message: '',
+    setSubmitError('');
+
+    // Validate
+    const validationErrors = validateForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          'Company Name': formData.companyName,
+          'Contact Person': formData.contactPerson,
+          Industry: formData.industry,
+          Phone: formData.phone,
+          Email: formData.email,
+          'Estimated Waste Volume': formData.wasteVolume,
+          Message: formData.message,
+        }),
       });
-    }, 3000);
+
+      if (response.ok) {
+        setSubmitted(true);
+        setFormData(initialFormData);
+        setErrors({});
+      } else {
+        const result = await response.json().catch(() => null);
+        setSubmitError(
+          result?.errors?.[0]?.message ||
+          'Something went wrong. Please try again or email us directly at info@wasteco.ae.',
+        );
+      }
+    } catch {
+      setSubmitError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const industries = [
@@ -89,13 +174,26 @@ export function Contact() {
     },
   ];
 
+  // Reusable inline error component
+  const FieldError = ({ message }: { message?: string }) =>
+    message ? (
+      <p className="mt-2 flex items-center text-sm text-red-500 font-medium">
+        <AlertCircle className="w-4 h-4 mr-1.5 flex-shrink-0" />
+        {message}
+      </p>
+    ) : null;
+
+  const inputClass = (field: keyof FormErrors) =>
+    `w-full px-6 py-4 bg-slate-50 border-2 rounded-2xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all font-light text-slate-800 placeholder:text-slate-400 ${errors[field] ? 'border-red-300 bg-red-50/30' : 'border-slate-200'
+    }`;
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500"></div>
         <OrganicBackground />
-        
+
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
           <div className="text-center">
             <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-md px-6 py-2 rounded-full mb-8 border border-white/30">
@@ -123,7 +221,9 @@ export function Contact() {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className="flex items-start space-x-4">
-                    <div className={`flex-shrink-0 p-3 rounded-2xl bg-gradient-to-br ${info.gradient} shadow-lg shadow-cyan-200/30 group-hover:scale-110 transition-transform duration-300`}>
+                    <div
+                      className={`flex-shrink-0 p-3 rounded-2xl bg-gradient-to-br ${info.gradient} shadow-lg shadow-cyan-200/30 group-hover:scale-110 transition-transform duration-300`}
+                    >
                       <info.icon className="w-6 h-6 text-white" strokeWidth={2} />
                     </div>
                     <div>
@@ -143,7 +243,10 @@ export function Contact() {
             <div className="lg:col-span-2">
               <div className="bg-white p-10 md:p-12 rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100">
                 <h2 className="text-4xl font-light text-slate-800 mb-3 tracking-tight">
-                  Request Your <span className="font-semibold text-transparent bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 bg-clip-text">Custom Quote</span>
+                  Request Your{' '}
+                  <span className="font-semibold text-transparent bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 bg-clip-text">
+                    Custom Quote
+                  </span>
                 </h2>
                 <p className="text-slate-600 mb-10 font-light leading-relaxed">
                   Share your details and we'll craft a personalized solution within 24 hours
@@ -154,15 +257,27 @@ export function Contact() {
                     <div className="inline-flex p-6 rounded-full bg-gradient-to-br from-emerald-400 to-teal-400 mb-6">
                       <CheckCircle2 className="w-12 h-12 text-white" strokeWidth={2} />
                     </div>
-                    <h3 className="text-3xl font-light text-slate-800 mb-3 tracking-tight">
-                      Thank You!
-                    </h3>
-                    <p className="text-slate-600 font-light leading-relaxed">
+                    <h3 className="text-3xl font-light text-slate-800 mb-3 tracking-tight">Thank You!</h3>
+                    <p className="text-slate-600 font-light leading-relaxed mb-6">
                       We've received your request. Our team will reach out within 24 hours.
                     </p>
+                    <button
+                      onClick={() => setSubmitted(false)}
+                      className="text-cyan-600 hover:text-cyan-700 font-medium underline underline-offset-4 transition-colors"
+                    >
+                      Submit another request
+                    </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                    {/* Submit Error Banner */}
+                    {submitError && (
+                      <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl">
+                        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm font-medium">{submitError}</p>
+                      </div>
+                    )}
+
                     {/* Company Name */}
                     <div>
                       <label htmlFor="companyName" className="block text-sm font-medium text-slate-700 mb-3 tracking-wide">
@@ -172,12 +287,12 @@ export function Contact() {
                         type="text"
                         id="companyName"
                         name="companyName"
-                        required
                         value={formData.companyName}
                         onChange={handleChange}
-                        className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all font-light text-slate-800 placeholder:text-slate-400"
+                        className={inputClass('companyName')}
                         placeholder="Your company name"
                       />
+                      <FieldError message={errors.companyName} />
                     </div>
 
                     {/* Contact Person */}
@@ -189,12 +304,12 @@ export function Contact() {
                         type="text"
                         id="contactPerson"
                         name="contactPerson"
-                        required
                         value={formData.contactPerson}
                         onChange={handleChange}
-                        className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all font-light text-slate-800 placeholder:text-slate-400"
+                        className={inputClass('contactPerson')}
                         placeholder="Your name"
                       />
+                      <FieldError message={errors.contactPerson} />
                     </div>
 
                     {/* Industry Type */}
@@ -205,10 +320,9 @@ export function Contact() {
                       <select
                         id="industry"
                         name="industry"
-                        required
                         value={formData.industry}
                         onChange={handleChange}
-                        className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all font-light text-slate-800"
+                        className={inputClass('industry')}
                       >
                         <option value="">Select your industry</option>
                         {industries.map((industry) => (
@@ -217,6 +331,7 @@ export function Contact() {
                           </option>
                         ))}
                       </select>
+                      <FieldError message={errors.industry} />
                     </div>
 
                     {/* Phone and Email */}
@@ -229,12 +344,12 @@ export function Contact() {
                           type="tel"
                           id="phone"
                           name="phone"
-                          required
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all font-light text-slate-800 placeholder:text-slate-400"
+                          className={inputClass('phone')}
                           placeholder="+971 XX XXX XXXX"
                         />
+                        <FieldError message={errors.phone} />
                       </div>
                       <div>
                         <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-3 tracking-wide">
@@ -244,12 +359,12 @@ export function Contact() {
                           type="email"
                           id="email"
                           name="email"
-                          required
                           value={formData.email}
                           onChange={handleChange}
-                          className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all font-light text-slate-800 placeholder:text-slate-400"
+                          className={inputClass('email')}
                           placeholder="your@email.com"
                         />
+                        <FieldError message={errors.email} />
                       </div>
                     </div>
 
@@ -261,10 +376,9 @@ export function Contact() {
                       <select
                         id="wasteVolume"
                         name="wasteVolume"
-                        required
                         value={formData.wasteVolume}
                         onChange={handleChange}
-                        className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all font-light text-slate-800"
+                        className={inputClass('wasteVolume')}
                       >
                         <option value="">Select estimated volume</option>
                         {wasteVolumes.map((volume) => (
@@ -273,6 +387,7 @@ export function Contact() {
                           </option>
                         ))}
                       </select>
+                      <FieldError message={errors.wasteVolume} />
                     </div>
 
                     {/* Additional Message */}
@@ -294,10 +409,20 @@ export function Contact() {
                     {/* Submit Button */}
                     <button
                       type="submit"
-                      className="w-full px-10 py-5 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 text-white rounded-full hover:shadow-xl hover:shadow-cyan-300/50 transition-all duration-300 font-medium text-lg transform hover:scale-105 inline-flex items-center justify-center"
+                      disabled={isSubmitting}
+                      className="w-full px-10 py-5 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 text-white rounded-full hover:shadow-xl hover:shadow-cyan-300/50 transition-all duration-300 font-medium text-lg transform hover:scale-105 inline-flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none"
                     >
-                      Submit Request
-                      <Send className="ml-3 w-5 h-5" strokeWidth={2} />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          Submit Request
+                          <Send className="ml-3 w-5 h-5" strokeWidth={2} />
+                        </>
+                      )}
                     </button>
 
                     <p className="text-sm text-slate-500 text-center font-light">
@@ -314,11 +439,14 @@ export function Contact() {
       {/* Map Section */}
       <section className="py-32 bg-white relative overflow-hidden">
         <OrganicBackground />
-        
+
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-light text-slate-800 mb-4 tracking-tight">
-              Visit Our <span className="font-semibold text-transparent bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 bg-clip-text">Location</span>
+              Visit Our{' '}
+              <span className="font-semibold text-transparent bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 bg-clip-text">
+                Location
+              </span>
             </h2>
             <p className="text-xl text-slate-500 font-light">
               Strategically positioned in Jebel Ali for optimal UAE coverage

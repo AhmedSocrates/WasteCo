@@ -5,11 +5,12 @@ import { Homepage } from './pages/Homepage';
 import { Services } from './pages/Services';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
+import { NotFound } from './pages/NotFound';
 
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col font-[Inter,system-ui,sans-serif]">
         <Navigation />
         <main className="flex-grow">
           <Routes>
@@ -17,6 +18,7 @@ export default function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
         <Footer />
