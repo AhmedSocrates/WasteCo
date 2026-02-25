@@ -151,19 +151,19 @@ export function Contact() {
     {
       icon: MapPin,
       title: 'Location',
-      details: ['Jebel Ali Industrial Area', 'Dubai, UAE'],
+      details: ['Al Sajaa Industrial Area', 'Sharjah, UAE'],
       gradient: 'from-cyan-400 to-teal-400',
     },
     {
       icon: Phone,
       title: 'Phone',
-      details: ['+971 4 XXX XXXX', '+971 50 XXX XXXX'],
+      details: ['+971 6 715 2802'],
       gradient: 'from-teal-400 to-emerald-400',
     },
     {
       icon: Mail,
       title: 'Email',
-      details: ['info@wasteco.ae', 'quotes@wasteco.ae'],
+      details: ['info@wasteco.ae', 'ahmedelfaki512@gmail.com'],
       gradient: 'from-emerald-400 to-green-400',
     },
     {

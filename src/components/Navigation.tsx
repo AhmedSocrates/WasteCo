@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Droplets } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import { Logo } from './Logo';
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,14 +21,8 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex justify-between items-center h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
-            <div className="bg-gradient-to-br from-cyan-400 via-teal-400 to-emerald-400 p-3 rounded-2xl shadow-lg shadow-cyan-200/50 group-hover:shadow-xl group-hover:shadow-cyan-300/50 transition-all duration-300">
-              <Droplets className="w-7 h-7 text-white" strokeWidth={2.5} />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold text-xl text-slate-800 tracking-tight">Wasteco</span>
-              <span className="text-xs text-cyan-600 tracking-wide">Al Ard Alkhadra</span>
-            </div>
+          <Link to="/">
+            <Logo />
           </Link>
 
           {/* Desktop Navigation */}
@@ -36,11 +31,10 @@ export function Navigation() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-6 py-2.5 rounded-full transition-all duration-300 ${
-                  isActive(link.path)
+                className={`px-6 py-2.5 rounded-full transition-all duration-300 ${isActive(link.path)
                     ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-white shadow-lg shadow-cyan-200/50'
                     : 'text-slate-600 hover:text-cyan-600 hover:bg-cyan-50/50'
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
@@ -70,11 +64,10 @@ export function Navigation() {
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsMenuOpen(false)}
-                className={`block px-6 py-3 rounded-2xl transition-all mb-2 ${
-                  isActive(link.path)
+                className={`block px-6 py-3 rounded-2xl transition-all mb-2 ${isActive(link.path)
                     ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-white shadow-lg shadow-cyan-200/50'
                     : 'text-slate-600 hover:bg-cyan-50/50'
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>

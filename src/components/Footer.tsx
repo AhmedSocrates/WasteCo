@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Droplets, MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
+import { Logo } from './Logo';
 
 export function Footer() {
   return (
@@ -8,15 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="bg-gradient-to-br from-cyan-400 via-teal-400 to-emerald-400 p-2.5 rounded-2xl shadow-lg shadow-cyan-200/50">
-                <Droplets className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold text-lg text-slate-800">Wasteco</span>
-                <span className="text-xs text-cyan-600">Al Ard Alkhadra Waste Collection</span>
-              </div>
-            </div>
+            <Logo textSize="lg" iconSize={6} />
             <p className="text-slate-600 leading-relaxed max-w-md">
               Harmonizing industry and nature through intelligent waste management solutions. Supporting the UAE's sustainable future.
             </p>
