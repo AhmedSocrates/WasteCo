@@ -9,7 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
-            <Logo textSize="lg" iconSize={6} />
+            <Logo size="xl" />
             <p className="text-slate-600 leading-relaxed max-w-md">
               Harmonizing industry and nature through intelligent waste management solutions. Supporting the UAE's sustainable future.
             </p>
