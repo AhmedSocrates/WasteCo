@@ -449,7 +449,7 @@ export function Contact() {
               </span>
             </h2>
             <p className="text-xl text-slate-500 font-light">
-              Strategically positioned in Jebel Ali for optimal UAE coverage
+              Strategically positioned in Al Sajaa Industrial Area for optimal UAE coverage
             </p>
           </div>
 
@@ -458,8 +458,8 @@ export function Contact() {
               <div className="inline-flex p-6 rounded-full bg-gradient-to-br from-cyan-400 to-teal-400 mb-6 shadow-xl shadow-cyan-200/50">
                 <MapPin className="w-12 h-12 text-white" strokeWidth={2} />
               </div>
-              <p className="text-lg font-medium text-slate-800 mb-2">Jebel Ali Industrial Area</p>
-              <p className="text-slate-600 font-light">Dubai, United Arab Emirates</p>
+              <p className="text-lg font-medium text-slate-800 mb-2">Al Sajaa Industrial Area</p>
+              <p className="text-slate-600 font-light">Sharjah, United Arab Emirates</p>
               <p className="text-sm text-slate-500 mt-6 font-light italic">
                 Interactive map integration available in production
               </p>

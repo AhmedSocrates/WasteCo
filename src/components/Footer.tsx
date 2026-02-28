@@ -48,11 +48,11 @@ export function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-cyan-500 flex-shrink-0 mt-0.5" strokeWidth={2} />
-                <span className="text-slate-600 leading-relaxed">Jebel Ali Industrial Area, Dubai, UAE</span>
+                <span className="text-slate-600 leading-relaxed">Al Sajaa Industrial Area, Sharjah, UAE</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-teal-500 flex-shrink-0" strokeWidth={2} />
-                <span className="text-slate-600">+971 4 XXX XXXX</span>
+                <span className="text-slate-600">+971 6 715 2802</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-emerald-500 flex-shrink-0" strokeWidth={2} />
